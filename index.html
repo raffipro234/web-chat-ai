@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WebChatAi - Ramadhan Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; transition: 0.5s; }
+        
+        /* Tema Ramadhan Sesuai Foto */
+        .theme-ramadhan {
+            background-color: #1a3a32; /* Hijau gelap pekat sesuai foto */
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0l40 40-40 40L0 40z' fill='%3C#ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            color: #fef3c7;
+        }
+
+        /* Header Style */
+        .ios-header {
+            background: rgba(30, 30, 30, 0.9);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Bubble Chat Mirip Foto */
+        .chat-bubble-bot {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fef3c7;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            padding: 12px 16px;
+            max-width: 85%;
+            font-size: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .chat-bubble-user {
+            background: #007aff;
+            color: white;
+            border-radius: 18px;
+            border-bottom-right-radius: 4px;
+            padding: 12px 16px;
+            max-width: 85%;
+            font-size: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Input Area iPhone */
+        .ios-footer {
+            background: rgba(26, 58, 50, 0.95);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .input-container {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 8px 12px;
+        }
+
+        #userInput {
+            background: transparent;
+            color: white;
+            outline: none;
+            width: 100%;
+            resize: none;
+        }
+
+        #userInput::placeholder { color: rgba(255,255,255,0.4); }
+
+        /* Dropdown Menu */
+        #menuDropdown { display: none; }
+        #menuDropdown.active { display: block; }
+
+        .credit-text {
+            font-size: 11px;
+            text-align: center;
+            padding-bottom: 10px;
+            opacity: 0.7;
+            color: #fef3c7;
+        }
+        .credit-text a { font-weight: bold; text-decoration: underline; color: #fbbf24; }
+    </style>
+</head>
+<body class="theme-ramadhan h-screen flex flex-col overflow-hidden">
+
+    <header class="ios-header p-4 flex justify-between items-center text-white">
+        <div>
+            <p class="text-[10px] opacity-50 uppercase tracking-widest">Web Chat Ai</p>
+            <h1 class="text-xl font-bold">Ramadhan Edition</h1>
+            <p class="text-[10px] opacity-70">Oulth Tema</p>
+        </div>
+        <div class="flex gap-2 relative">
+            <button onclick="toggleMenu()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">⚙️</button>
+            <div id="menuDropdown" class="absolute right-0 mt-12 w-40 bg-gray-800 rounded-xl shadow-xl z-50 overflow-hidden border border-gray-700">
+                <button onclick="setTheme('default')" class="w-full p-3 text-left hover:bg-gray-700 text-white text-sm">Light Mode</button>
+                <button onclick="setTheme('ramadhan')" class="w-full p-3 text-left hover:bg-gray-700 text-white text-sm">Tema Ramadhan</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="chatbox" class="flex-1 overflow-y-auto p-4 space-y-5">
+        <div class="flex justify-start">
+            <div class="chat-bubble-bot">
+                🌙 <b>Selamat Berpuasa!</b><br>
+                Halo! Saya WebChatAi, siap membantu menjawab pertanyaanmu. Silakan chat di bawah.
+            </div>
+        </div>
+    </main>
+
+    <div id="imagePreviewContainer" class="hidden px-4 mb-2">
+        <div class="relative inline-block rounded-xl overflow-hidden border-2 border-yellow-500">
+            <img id="previewImg" src="#" class="h-24 w-24 object-cover">
+            <button onclick="clearImage()" class="absolute top-0 right-0 bg-black/70 text-white p-1 text-[10px]">✕</button>
+        </div>
+    </div>
+
+    <footer class="ios-footer p-4">
+        <div class="input-container flex items-center gap-3 mb-3">
+            <label class="cursor-pointer opacity-80 hover:opacity-100">
+                <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="previewFile()">
+                <span class="text-xl">📎</span>
+            </label>
+            <textarea id="userInput" rows="1" placeholder="Ketik pesan..."></textarea>
+            <button onclick="sendMessage()" class="text-blue-400 font-bold px-2">KIRIM</button>
+        </div>
+        
+        <div class="credit-text">
+            Create by <a href="https://wa.me/6288275710628" target="_blank">@Raffioffci2</a>
+        </div>
+    </footer>
+
+    <script>
+        const chatbox = document.getElementById('chatbox');
+        const userInput = document.getElementById('userInput');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const previewImg = document.getElementById('previewImg');
+        const menuDropdown = document.getElementById('menuDropdown');
+
+        function toggleMenu() { menuDropdown.classList.toggle('active'); }
+        
+        function setTheme(theme) {
+            document.body.className = theme === 'ramadhan' ? 'theme-ramadhan' : 'bg-gray-100';
+            menuDropdown.classList.remove('active');
+        }
+
+        function previewFile() {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImg.src = e.target.result;
+                    imagePreviewContainer.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearImage() {
+            fileInput.value = "";
+            imagePreviewContainer.classList.add('hidden');
+        }
+
+        function appendMessage(role, text, isImage = false) {
+            const div = document.createElement('div');
+            div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            let content = `<div class="${role === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot'}">`;
+            if (isImage) {
+                content += `<img src="${text}" class="rounded-lg mb-2 max-w-full shadow-md">`;
+            } else {
+                content += text;
+            }
+            content += `</div>`;
+            
+            div.innerHTML = content;
+            chatbox.appendChild(div);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            const hasImage = fileInput.files.length > 0;
+
+            if (!text && !hasImage) return;
+
+            if (hasImage) appendMessage('user', previewImg.src, true);
+            if (text) appendMessage('user', text);
+
+            userInput.value = "";
+            clearImage();
+
+            // Loading state
+            const loading = document.createElement('div');
+            loading.className = 'flex justify-start opacity-50 text-[10px] italic px-4';
+            loading.innerText = 'Bot memproses...';
+            chatbox.appendChild(loading);
+
+            try {
+                const res = await fetch(`https://next-api-v1.vercel.app/ai/gpt4?prompt=${encodeURIComponent(text)}`);
+                const data = await res.json();
+                loading.remove();
+                appendMessage('bot', data.result || "Maaf, coba lagi nanti.");
+            } catch (e) {
+                loading.remove();
+                appendMessage('bot', "Gagal terhubung ke server.");
+            }
+        }
+    </script>
+</body>
+</html>
